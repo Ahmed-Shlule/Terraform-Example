@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.8"
+}
+
 provider "aws" {
   region = "eu-west-2"
 }
@@ -18,7 +22,7 @@ resource "aws_security_group" "instance" {
   }
 }
 
-resource "aws_instance" "example" {
+resource "aws_launch_configuration" "example" {
   ami           = "ami-6b3fd60c"
   instance_type = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.instance.id}"]
@@ -28,8 +32,8 @@ resource "aws_instance" "example" {
               echo "Hello, World" > index.html
               nohup busybox httpd -f -p "${var.server_port}" &
               EOF
-  tags {
-    Name = "terraform-example"
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
